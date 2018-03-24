@@ -6,28 +6,35 @@ var canvas = document.getElementById("DividedPointCanvas"),
 ctx2 = canvas.getContext("2d");
 
 var PointsX = [], PointsY = [], Points = [];
-var size = 16;
+var size;
 var height = 500, width = 500
 var list = []
-var thing = []
+var thing = [], thing2 = []
 
 function DoTest(){
   
     FillList();
+    // FillRandom(50);
+
     InsertSort(Points);
     console.log(Points)
+
     var resultDivide = closestDivideAndConquer(Points)
-    console.log('tttt')
-    console.log(thing);
+
     var resultBrute = BruteForce(Points,size);
+
     DrawPoints()
     DrawPoints2()
+
     console.log('resultBrute: ' + dist(resultBrute[0],resultBrute[1]))
     console.log('resultDivide: ' + resultDivide)
-    console.log(resultBrute)
+
    
-//     DrawPoint(thing[0].x,thing[0].y, "#FF0000")
-//    DrawPoint(thing[1].x,thing[1].y, "#FF0000")
+    DrawPoint(thing[0].x,thing[0].y, "#FF0000")
+    DrawPoint(thing[1].x,thing[1].y, "#FF0000")
+
+    DrawPoint2(resultBrute[0].x,resultBrute[0].y, "#FF0000")
+    DrawPoint2(resultBrute[1].x,resultBrute[1].y, "#FF0000")
 
 }
 
@@ -48,6 +55,20 @@ function FillList(){
     Points[13] = {x:7,y:-10}
     Points[14] = {x:9,y:-5}
     Points[15] = {x:11.5,y:-4} 
+
+    // Points = [{ x:2, y: 3}, { x:12, y: 30}, { x:40, y: 50}, { x:5, y: 1}, { x:12, y: 10}, { x:3, y: 4}];
+     size = Points.length
+}
+
+function FillRandom(x){
+    for (var i = 0; i < x; i++) {
+        Points.push({x: GetRandom(-20,20),y: GetRandom(-20,20)})
+    }
+    size = Points.length
+}
+
+function GetRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
 function BruteForce(P, n){
@@ -108,7 +129,7 @@ function closestDivideAndConquer(P){
             return dist(P[0],P[1]);
         }
 
-        var mid = (P.length)/2;
+        var mid = Math.round((P.length)/2);
         console.log(mid)
         var midPoint = P[mid]
         //var midPoint = P[mid];
@@ -123,25 +144,35 @@ function closestDivideAndConquer(P){
         console.log('L2: '+P2.length)
         d1 = closestDivideAndConquer(P1);
         d2 = closestDivideAndConquer(P2);
+        console.log(midPoint)
+        console.log(P2)
+        d3 = dist(P1[mid-1], P2[0])
+        var d = Math.min(d1,d2,d3)
 
         var strip = []
         for (var i = 0; i < P.length; i++){
             if (Math.abs(P[i].x - midPoint.x) < d)
                 strip.push(P[i])
         }
-        var d = Math.min(d1,d2)
         // var result = d
         console.log('oowowo')
         return Math.min(d,CheckClosest(strip,d))
     }
 
 function CheckClosest(points,minDist){
+    if(points.length < 2)
+        return minDist
     InsertSort(points,false)
+    console.log('the size ' + points.length)
     var min = minDist
-    for (var i = 0; i < points.length; i++) {
-        for (var j = 0; j < points.length && (points[j].y-points[y].y)<min; j++) {
+    for (var i = 0; i < points.length-1; i++) {
+        for (var j = i+1; j < points.length && points[j].y-points[i].y < min; j++) {
             if (dist(points[i],points[j]) < min)
+                thing = []
+                thing.push(points[i])
+                thing.push(points[j])
                 min = dist(points[i], points[j]);
+                console.log('the min ' + min)
            }
     }
     return min;
