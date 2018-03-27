@@ -21,6 +21,7 @@ function Random(){
 }
 
 function CalculateClosestPoint(){
+    //ordena por x
     InsertSort(Points);
     console.log(Points)
 
@@ -34,6 +35,7 @@ function CalculateClosestPoint(){
     console.log('resultDivide: ' + resultDivide)
     console.log('to see ' + pointsToCheck.length)
     var closestPoints = GetPoints(resultDivide)
+    console.log(closestPoints)
     DrawPoint(closestPoints[0].x,closestPoints[0].y, "#FF0000")
     DrawPoint(closestPoints[1].x,closestPoints[1].y, "#FF0000")
 
@@ -141,16 +143,24 @@ function DrawPoint2(x,y, color){
     ctx2.fillStyle = color;
     ctx2.fillRect(mW+(x*multiplier)-(pointSize/2),mH+(y*multiplier)-(pointSize/2),pointSize,pointSize);
 }
-
-function closestDivideAndConquer(P){ 
-    pointsToCheck = []
+pointsToCheck = []
+function closestDivideAndConquer(P, msg = 'blank'){ 
+        
         if(P.length==1){
-            return Infinity
+            return 200
         }
         if(P.length==2){
             pointsToCheck.push(P[0])
             pointsToCheck.push(P[1])
             return dist(P[0],P[1]);
+        }
+
+        if(P.length<=3){
+            var result = BruteForce(P);
+
+            pointsToCheck.push(result[0])
+            pointsToCheck.push(result[1])
+            return dist(result[0],result[1])
         }
         
         var mid = Math.round((P.length)/2);
@@ -169,11 +179,10 @@ function closestDivideAndConquer(P){
 
         console.log('L1: '+P1.length)
         console.log('L2: '+P2.length)
-        d1 = closestDivideAndConquer(P1);
-        d2 = closestDivideAndConquer(P2);
-       
-        console.log('d1 ' + d1)
+        d1 = closestDivideAndConquer(P1, 'd1');
+        d2 = closestDivideAndConquer(P2, 'd2');
         
+        console.log('d1 ' + d1)
         console.log('d2 ' + d2)
 
         var d = Math.min(d1,d2)
@@ -188,10 +197,12 @@ function closestDivideAndConquer(P){
 
         var result = Math.min(d,CheckBorderPoints(borderPoints,d))
         console.log('the result is ' + result)
+        console.log('i am ' + msg)
         return result
     }
 
 function CheckBorderPoints(points,minDist){
+    console.log('received '+minDist)
     if(points.length <2)
         return minDist;
     InsertSort(points,false)

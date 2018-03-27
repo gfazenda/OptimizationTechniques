@@ -1,0 +1,10 @@
+2 pontos no X extremo
+depois separar pontos acima ou abaixo (ccw ou produto escalar)
+pontos mais distantes de cada lado
+remove todos interiores da particao de baixo
+ruim quando todos os pontos fazem parte da convex hull
+
+graham
+
+ordena pontos por x
+menor y
