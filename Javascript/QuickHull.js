@@ -12,12 +12,16 @@ function DoQuickHull(){
    
     DrawPoints(points)
 
-    console.log('1111')
+    
+
     QuickHull(points)
     console.log(chosen);
+    
     for (var i = 0; i < chosen.length; i++) {
         DrawPoint(chosen[i].x,chosen[i].y, "#FF0000")
     }
+
+    DrawLines(chosen);
 }
 
 function QuickHull(points){
@@ -33,36 +37,8 @@ function QuickHull(points){
         else{
             down.push(points[i])
         }
-        console.log(ccw(a,b,points[i]))
+        // console.log(ccw(a,b,points[i]))
     }
-
-    // var distantPoint = null;
-    // var dist = 0, currArea = 0;
-    // for (var i = 0; i < up.length; i++) {
-    //     dist = TriangleArea(a,b,up[i])
-    //     if(dist > currArea){
-    //         currArea = dist;
-    //         distantPoint = up[i]
-    //     }
-    // }
-    // chosen.push(distantPoint);  
-
-    // for (var i = 0; i < up.length; i++) {
-    //     if(chosen[2] != up[i] && !IsInsideTriangle(chosen[0],chosen[1],chosen[2],up[i])){
-    //         chosen.push(up[i]);
-    //     }
-    // }
-    // for (var i = 0; i < down.length; i++) {
-    //     dist = TriangleArea(P[0],P[P.length-1],down[i])
-    //     if(dist > currArea){
-    //         currArea = dist;
-    //         distantPoint = down[i]
-    //     }
-    // }
-    
-    // console.log('area ' +currArea)
-    // console.log('point')
-    // console.log(distantPoint)
 
     FindHull(up,a,b)
     FindHull(down,a,b)
@@ -93,6 +69,7 @@ function FindHull(points, pA, pB, up = false){
         }
     }
 
+    console.log('possible points '+ newList.length)
 
     if(newList.length == 0 ){
         chosen.push(distantPoint);
@@ -101,17 +78,21 @@ function FindHull(points, pA, pB, up = false){
 
     var up = [], down = []
     for (var i = 0; i < newList.length; i++) {
-        if(ccw(pA,pB,newList[i]) < 0){
+        if(ccw(pA,distantPoint,newList[i]) < 0){
             up.push(newList[i])
         }
-        else{
+        else if(ccw(distantPoint,pB,newList[i]) < 0){
             down.push(newList[i])
         }
         // console.log(ccw(pA,pB,newList[i]))
     }
 
+    console.log('la resolucion')
+    console.log(up)
+    console.log(down)
+
     FindHull(up,pA,distantPoint)
-    FindHull(down,pB,distantPoint)
+    FindHull(down,distantPoint,pB)
 
 
 }
@@ -143,6 +124,14 @@ function DrawPoints(pointsToDraw){
  
 }
 
+function DrawLines(linePoints){
+    for (var i = 0; i < linePoints.length-1; i++) {
+        console.log('ddddd')
+        Draw(linePoints[i],linePoints[i+1])
+    }
+    Draw(linePoints[linePoints.length-1],linePoints[0])
+}
+
 var mH = height/2, mW = width/2, multiplier = 10, pointSize = 5
 
 function DrawPoint(x,y, color){
@@ -156,10 +145,17 @@ function TriangleArea(p1,p2,p3){
 
 function Draw(p1,p2){
     ctx.beginPath();
-    ctx.moveTo(p1.x,p1.y);
-    ctx.lineTo(p2.x,p2.y);
+    x1 = mW+(p1.x*multiplier)-(pointSize/2)
+    x2 = mW+(p2.x*multiplier)-(pointSize/2)
+    y1 = mH+(p1.y*multiplier)-(pointSize/2)
+    y2 = mH+(p2.y*multiplier)-(pointSize/2)
+    
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
     ctx.stroke();
 }
+
+
 
 
 function ccw(p1, p2, p3) {
