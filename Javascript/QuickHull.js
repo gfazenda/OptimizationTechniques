@@ -21,7 +21,16 @@ function DoQuickHull(){
         DrawPoint(chosen[i].x,chosen[i].y, "#FF0000")
     }
 
-    DrawLines(chosen);
+     
+    //  P1 = {x:-10,y: 9}
+    //  P2 = {x:5,y:11.5}
+    //  P3 = {x: 2, y: 12.5}
+    //  DrawPoint(P1.x,P1.y, "#FF0000")
+    //  DrawPoint(P2.x,P2.y, "#FF0000")
+    //  DrawPoint(P3.x,P3.y, "#FF0000")
+    //   console.log('cccc ' + IsOnTheRight(P2,P1,P3))
+    // InsertSort(chosen)
+      DrawLines(chosen);
 }
 
 function QuickHull(points){
@@ -31,7 +40,7 @@ function QuickHull(points){
     chosen.push(b)
     var up = [], down = []
     for (var i = 1; i < points.length-1; i++) {
-        if(ccw(a,b,points[i]) < 0){
+        if(ccw(a,b,points[i]) > 0){
             up.push(points[i])
         }
         else{
@@ -39,24 +48,25 @@ function QuickHull(points){
         }
         // console.log(ccw(a,b,points[i]))
     }
-
-    FindHull(up,a,b)
+    // chosen = up;
+    // return;
+    FindHull(up,b,a)
     FindHull(down,a,b)
 
 }
 
-function FindHull(points, pA, pB, up = false){
+function FindHull(points, pA, pB, dir = true){
     if(points.length ==0)
          return;
 
     var newList = []
-    var distantPoint = null;
+    var pC = null;
     var dist = 0, currArea = 0, index = -1;
     for (var i = 0; i < points.length; i++) {
         dist = Math.abs(TriangleArea(pA,pB,points[i]))
         if(dist > currArea){
             currArea = dist;
-            distantPoint = points[i]
+            pC = points[i]
             index = i
         }
     }
@@ -64,35 +74,36 @@ function FindHull(points, pA, pB, up = false){
     points.splice(index,1);
     
     for (var i = 0; i < points.length; i++) {
-        if(!IsInsideTriangle(pA,pB,distantPoint,points[i])){
+        if(!IsInsideTriangle(pA,pB,pC,points[i])){
             newList.push(points[i]);
         }
     }
 
     console.log('possible points '+ newList.length)
+    //chosen = newList;
+   // return;
 
-    if(newList.length == 0 ){
-        chosen.push(distantPoint);
-        return;
-    }
+    //if(newList.length == 0 ){
+    //chosen.push(pC);
+    chosen.splice(1, 0, pC);
+      //  return;
+    //}
 
     var up = [], down = []
     for (var i = 0; i < newList.length; i++) {
-        if(ccw(pA,distantPoint,newList[i]) < 0){
+        if(IsOnTheRight(pA,pC,newList[i])){
             up.push(newList[i])
-        }
-        else if(ccw(distantPoint,pB,newList[i]) < 0){
+        }else if(IsOnTheRight(pC,pB,newList[i])){
             down.push(newList[i])
         }
-        // console.log(ccw(pA,pB,newList[i]))
     }
 
     console.log('la resolucion')
     console.log(up)
     console.log(down)
 
-    FindHull(up,pA,distantPoint)
-    FindHull(down,distantPoint,pB)
+    FindHull(up,pA,pC)
+    FindHull(down,pC,pB)
 
 
 }
@@ -129,14 +140,14 @@ function DrawLines(linePoints){
         console.log('ddddd')
         Draw(linePoints[i],linePoints[i+1])
     }
-    Draw(linePoints[linePoints.length-1],linePoints[0])
+    // Draw(linePoints[linePoints.length-1],linePoints[0])
 }
 
 var mH = height/2, mW = width/2, multiplier = 10, pointSize = 5
 
 function DrawPoint(x,y, color){
     ctx.fillStyle = color;
-    ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH+(y*multiplier)-(pointSize/2),pointSize,pointSize);
+    ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
 }
 
 function TriangleArea(p1,p2,p3){
@@ -147,19 +158,20 @@ function Draw(p1,p2){
     ctx.beginPath();
     x1 = mW+(p1.x*multiplier)-(pointSize/2)
     x2 = mW+(p2.x*multiplier)-(pointSize/2)
-    y1 = mH+(p1.y*multiplier)-(pointSize/2)
-    y2 = mH+(p2.y*multiplier)-(pointSize/2)
+    y1 = mH-(p1.y*multiplier)-(pointSize/2)
+    y2 = mH-(p2.y*multiplier)-(pointSize/2)
     
     ctx.moveTo(x1,y1);
     ctx.lineTo(x2,y2);
     ctx.stroke();
 }
 
-
-
+function IsOnTheRight(p1,p2,p3){
+    return (ccw(p1, p2, p3) < 0)
+}
 
 function ccw(p1, p2, p3) {
-    // ccw > 0: counter-clockwise; ccw < 0: clockwise; ccw = 0: collinear
+    // ccw > 0: counter-clockwise (left); ccw < 0: clockwise (right); ccw = 0: collinear
     return (p2.x - p1.x) * (p3.y - p1.y)
     - (p2.y - p1.y) * (p3.x - p1.x);
 }
