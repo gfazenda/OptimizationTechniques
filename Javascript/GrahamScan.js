@@ -1,15 +1,16 @@
 
 var canvas = document.getElementById("GrahamScan"),
-ctx = canvas.getContext("2d");
+contextGraham = canvas.getContext("2d");
+
 var points = [];
 var height = 300, width = 300
 var mH = height/2, mW = width/2, multiplier = 8, pointSize = 5
-var chosen = []
+var hullPoints = []
 var PI = 3.14
 var ONE_RADIAN = (2*PI)
 
 function DoGrahamScan(){
-  
+    SetCTX(contextGraham)
     FillPoints();
     InsertSort(points,false)
     console.log(points)
@@ -19,7 +20,7 @@ function DoGrahamScan(){
     
 
     GrahamScan(points)
-    //console.log(chosen);
+    //console.log(hullPoints);
     
     // var p1 = {x: 5, y: 11.5}
     // var p2 = {x: 2, y: 12.5}
@@ -33,13 +34,13 @@ function DoGrahamScan(){
     // var p2 = {x: 11.5, y: -4}
     // var p3 = {x: 9, y: -5}
     // console.log('wiueqwuieewi ' +ccw(p1,p2,p3))
-    // chosen = []
-    // chosen.push(p1)
-    // chosen.push(p2)
-    // chosen.push(p3)
-    for (var i = 0; i < chosen.length; i++) {
-        // console.log(chosen[i])
-        DrawPoint(chosen[i].x,chosen[i].y, "#FF0000")
+    // hullPoints = []
+    // hullPoints.push(p1)
+    // hullPoints.push(p2)
+    // hullPoints.push(p3)
+    for (var i = 0; i < hullPoints.length; i++) {
+        // console.log(hullPoints[i])
+        DrawPoint(hullPoints[i].x,hullPoints[i].y, "#FF0000")
     }
 
 
@@ -49,7 +50,7 @@ function DoGrahamScan(){
     
 
 
-    DrawLines(chosen);
+    DrawLines(hullPoints);
 }
 
 function GrahamScan(array){
@@ -73,21 +74,21 @@ function GrahamScan(array){
     InsertSortByAngle(array)
 
     
-    // chosen.push(array[0])
-    // chosen.push(array[1])
-    // //chosen.push(array[2])
+    // hullPoints.push(array[0])
+    // hullPoints.push(array[1])
+    // //hullPoints.push(array[2])
     // return;
 
-    chosen.push(initial)
-    chosen.push(array[0])
-    chosen.push(array[1])
+    hullPoints.push(initial)
+    hullPoints.push(array[0])
+    hullPoints.push(array[1])
 
     for (var i = 2; i < array.length; i++) {
-        while(ccw(chosen.secondToLast(),chosen.last(),array[i]) < 0){
-            chosen.pop();
+        while(ccw(hullPoints.secondToLast(),hullPoints.last(),array[i]) < 0){
+            hullPoints.pop();
         }
-        chosen.push(array[i])
-        console.log(chosen.length);
+        hullPoints.push(array[i])
+        console.log(hullPoints.length);
     }
     //  console.log(array)
 
@@ -146,62 +147,62 @@ function FillPoints(){
     //     {x:5, y:-3}]
 }
 
-function DrawLines(){
-    for (var i = 0; i < L.length; i++) {
-        Draw(L[i].p0,L[i].p1)
-    }
-}
+// function DrawLines(){
+//     for (var i = 0; i < L.length; i++) {
+//         Draw(L[i].p0,L[i].p1)
+//     }
+// }
 
-function DrawPoints(pointsToDraw){
-    for (var i = 0; i < pointsToDraw.length; i++) {
-        DrawPoint(pointsToDraw[i].x,pointsToDraw[i].y,"#000000")
-    }
+// function DrawPoints(pointsToDraw){
+//     for (var i = 0; i < pointsToDraw.length; i++) {
+//         DrawPoint(pointsToDraw[i].x,pointsToDraw[i].y,"#000000")
+//     }
  
-}
+// }
 
-function DrawLines(array){
-    linePoints = ConvertToScreenPoints(array);
-    console.log(linePoints)
-    for (var i = 0; i < linePoints.length-1; i++) {
-        Draw(linePoints[i],linePoints[i+1])
-    }
-    Draw(linePoints[linePoints.length-1],linePoints[0])
-}
+// function DrawLines(array){
+//     linePoints = ConvertToScreenPoints(array);
+//     console.log(linePoints)
+//     for (var i = 0; i < linePoints.length-1; i++) {
+//         Draw(linePoints[i],linePoints[i+1])
+//     }
+//     Draw(linePoints[linePoints.length-1],linePoints[0])
+// }
 
-function ConvertToScreenPoints(array){
-    var newArray = []
-    for (var i = 0; i < array.length; i++) {
-        newArray.push(WorldPointToCanvas(array[i]))
-    }
-    return newArray;
-}
+// function ConvertToScreenPoints(array){
+//     var newArray = []
+//     for (var i = 0; i < array.length; i++) {
+//         newArray.push(WorldPointToCanvas(array[i]))
+//     }
+//     return newArray;
+// }
 
-function WorldPointToCanvas(point){
-    return {x: mW+(point.x*multiplier)-(pointSize/2), y:mH-(point.y*multiplier)-(pointSize/2)};
-}   
+// function WorldPointToCanvas(point){
+//     return {x: mW+(point.x*multiplier)-(pointSize/2), y:mH-(point.y*multiplier)-(pointSize/2)};
+// }   
 
-function DrawPoint(x1,y1, color){
-    ctx.fillStyle = color;
-    var point = {x: x1, y: y1};
-    var convertedPoint = WorldPointToCanvas(point)
-    ctx.fillRect(convertedPoint.x,convertedPoint.y,pointSize,pointSize);
-}
+// function DrawPoint(x1,y1, color){
+//     ctx.fillStyle = color;
+//     var point = {x: x1, y: y1};
+//     var convertedPoint = WorldPointToCanvas(point)
+//     ctx.fillRect(convertedPoint.x,convertedPoint.y,pointSize,pointSize);
+// }
 
 function TriangleArea(p1,p2,p3){
     return Math.abs(0.5 * ((p1.x*p2.y)+(p2.x*p3.y)+(p3.x*p1.y)-(p1.x*p3.y)-(p2.x*p1.y)-(p3.x*p2.y)))
 }
 
-function Draw(p1,p2){
-    ctx.beginPath();
-    // x1 = mW+(p1.x*multiplier)-(pointSize/2)
-    // x2 = mW+(p2.x*multiplier)-(pointSize/2)
-    // y1 = mH+(p1.y*multiplier)-(pointSize/2)
-    // y2 = mH+(p2.y*multiplier)-(pointSize/2)
+// function Draw(p1,p2){
+//     ctx.beginPath();
+//     // x1 = mW+(p1.x*multiplier)-(pointSize/2)
+//     // x2 = mW+(p2.x*multiplier)-(pointSize/2)
+//     // y1 = mH+(p1.y*multiplier)-(pointSize/2)
+//     // y2 = mH+(p2.y*multiplier)-(pointSize/2)
     
-    ctx.moveTo(p1.x,p1.y);
-    ctx.lineTo(p2.x,p2.y);
-    ctx.stroke();
-}
+//     ctx.moveTo(p1.x,p1.y);
+//     ctx.lineTo(p2.x,p2.y);
+//     ctx.stroke();
+// }
 
 
 

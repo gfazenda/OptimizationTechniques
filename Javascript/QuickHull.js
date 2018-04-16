@@ -1,11 +1,11 @@
 
 var canvas = document.getElementById("QuickHull"),
-ctx = canvas.getContext("2d");
+contextQuick = canvas.getContext("2d");
 var points = [];
 var height = 500, width = 500
 var chosen = []
 function DoQuickHull(){
-  
+    SetCTX(contextQuick)
     FillPoints();
     InsertSort(points)
     console.log(points)
@@ -30,7 +30,7 @@ function DoQuickHull(){
     //  DrawPoint(P3.x,P3.y, "#FF0000")
     //   console.log('cccc ' + IsOnTheRight(P2,P1,P3))
     // InsertSort(chosen)
-      DrawLines(chosen);
+  //    DrawLines(chosen);
 }
 
 function QuickHull(points){
@@ -121,50 +121,50 @@ function FillPoints(){
     // points = [{x: 0, y:  0}, {x: 0, y:  4}, {x: -4, y:  0}, {x: 5, y:  0}, {x: 0, y:  -6}, {x: 1, y:  0}]
 }
 
-function DrawLines(){
-    for (var i = 0; i < L.length; i++) {
-        Draw(L[i].p0,L[i].p1)
-    }
-}
+// function DrawLines(){
+//     for (var i = 0; i < L.length; i++) {
+//         Draw(L[i].p0,L[i].p1)
+//     }
+// }
 
-function DrawPoints(pointsToDraw){
+// function DrawPoints(pointsToDraw){
     
-    for (var i = 0; i < pointsToDraw.length; i++) {
-        DrawPoint(pointsToDraw[i].x,pointsToDraw[i].y,"#000000")
-    }
+//     for (var i = 0; i < pointsToDraw.length; i++) {
+//         DrawPoint(pointsToDraw[i].x,pointsToDraw[i].y,"#000000")
+//     }
  
-}
+// }
 
-function DrawLines(linePoints){
-    for (var i = 0; i < linePoints.length-1; i++) {
-        console.log('ddddd')
-        Draw(linePoints[i],linePoints[i+1])
-    }
-    // Draw(linePoints[linePoints.length-1],linePoints[0])
-}
+// function DrawLines(linePoints){
+//     for (var i = 0; i < linePoints.length-1; i++) {
+//         console.log('ddddd')
+//         Draw(linePoints[i],linePoints[i+1])
+//     }
+//     // Draw(linePoints[linePoints.length-1],linePoints[0])
+// }
 
-var mH = height/2, mW = width/2, multiplier = 10, pointSize = 5
+// var mH = height/2, mW = width/2, multiplier = 10, pointSize = 5
 
-function DrawPoint(x,y, color){
-    ctx.fillStyle = color;
-    ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
-}
+// function DrawPoint(x,y, color){
+//     ctx.fillStyle = color;
+//     ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
+// }
 
-function TriangleArea(p1,p2,p3){
-    return Math.abs(0.5 * ((p1.x*p2.y)+(p2.x*p3.y)+(p3.x*p1.y)-(p1.x*p3.y)-(p2.x*p1.y)-(p3.x*p2.y)))
-}
+// function TriangleArea(p1,p2,p3){
+//     return Math.abs(0.5 * ((p1.x*p2.y)+(p2.x*p3.y)+(p3.x*p1.y)-(p1.x*p3.y)-(p2.x*p1.y)-(p3.x*p2.y)))
+// }
 
-function Draw(p1,p2){
-    ctx.beginPath();
-    x1 = mW+(p1.x*multiplier)-(pointSize/2)
-    x2 = mW+(p2.x*multiplier)-(pointSize/2)
-    y1 = mH-(p1.y*multiplier)-(pointSize/2)
-    y2 = mH-(p2.y*multiplier)-(pointSize/2)
+// function Draw(p1,p2){
+//     ctx.beginPath();
+//     x1 = mW+(p1.x*multiplier)-(pointSize/2)
+//     x2 = mW+(p2.x*multiplier)-(pointSize/2)
+//     y1 = mH-(p1.y*multiplier)-(pointSize/2)
+//     y2 = mH-(p2.y*multiplier)-(pointSize/2)
     
-    ctx.moveTo(x1,y1);
-    ctx.lineTo(x2,y2);
-    ctx.stroke();
-}
+//     ctx.moveTo(x1,y1);
+//     ctx.lineTo(x2,y2);
+//     ctx.stroke();
+// }
 
 function IsOnTheRight(p1,p2,p3){
     return (ccw(p1, p2, p3) < 0)

@@ -4,6 +4,7 @@ var ctx;
 
 function SetCTX(ctxobj){
     ctx = ctxobj;
+    // clearCanvas(canvas);
 }
 
 function DrawLines(){
@@ -57,4 +58,12 @@ function Draw(p1,p2){
     ctx.moveTo(p1.x,p1.y);
     ctx.lineTo(p2.x,p2.y);
     ctx.stroke();
+}
+
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, width,height);
+    // var w = canvas.width;
+    // canvas.width = 1;
+    // canvas.width = w;
 }

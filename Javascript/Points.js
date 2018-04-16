@@ -68,16 +68,16 @@ function FillList(){
 
     // Points = [{x:2,y:1},{x:3,y:5},{x:8,y:3},{x:5,y:8},{x:9,y:1},{x:5,y:2},{x:3,y:3},{x:4,y:5},{x:6,y:5},{x:1,y:9}];
 
-    Points = [{x:2,y:1},
-        {x:8,y:3},
-        {x:5,y:8},
-        {x:9,y:1},
-        {x:5,y:2},
-        {x:3,y:3},
-        {x:4,y:5},
-        {x:6,y:5},
-        {x:1,y:9},
-        {x:2,y:1.5}];
+    // Points = [{x:2,y:1},
+    //     {x:8,y:3},
+    //     {x:5,y:8},
+    //     {x:9,y:1},
+    //     {x:5,y:2},
+    //     {x:3,y:3},
+    //     {x:4,y:5},
+    //     {x:6,y:5},
+    //     {x:1,y:9},
+    //     {x:2,y:1.5}];
     //Points = [{ x:2, y: 3}, { x:12, y: 30}, { x:40, y: 50}, { x:5, y: 1}, { x:12, y: 10}, { x:3, y: 4}];
      size = Points.length
 }
@@ -136,12 +136,12 @@ var mH = height/2, mW = width/2, multiplier = 15, pointSize = 5
 
 function DrawPoint(x,y, color){
     ctx.fillStyle = color;
-    ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH+(y*multiplier)-(pointSize/2),pointSize,pointSize);
+    ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
 }
 
 function DrawPoint2(x,y, color){
     ctx2.fillStyle = color;
-    ctx2.fillRect(mW+(x*multiplier)-(pointSize/2),mH+(y*multiplier)-(pointSize/2),pointSize,pointSize);
+    ctx2.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
 }
 pointsToCheck = []
 function closestDivideAndConquer(P, msg = 'blank'){ 
