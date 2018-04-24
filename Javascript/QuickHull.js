@@ -1,37 +1,67 @@
 
-var canvas = document.getElementById("QuickHull"),
-contextQuick = canvas.getContext("2d");
+var canvasQ = document.getElementById("QuickHull"),
+contextQuick = canvasQ.getContext("2d");
 var points = [];
 var height = 500, width = 500
 var chosen = []
+var range = 15;
+function DoNormal(){
+    SetCTX(contextQuick)
+    clearCanvas(canvasQ);
+    FillPoints();
+    DoQuickHull();
+}
+
+function DoRandom(){
+    SetCTX(contextQuick)
+    clearCanvas(canvasQ);
+    points = FillRandom(50);
+    DoQuickHull();
+}
+
 function DoQuickHull(){
     SetCTX(contextQuick)
-    FillPoints();
-    InsertSort(points)
-    console.log(points)
+    chosen = []
+
+    QuickSort(points, 0, points.length-1,'x')
+
    
     DrawPoints(points)
 
     
 
     QuickHull(points)
-    console.log(chosen);
     
     for (var i = 0; i < chosen.length; i++) {
         DrawPoint(chosen[i].x,chosen[i].y, "#FF0000")
     }
 
-     
-    //  P1 = {x:-10,y: 9}
-    //  P2 = {x:5,y:11.5}
-    //  P3 = {x: 2, y: 12.5}
-    //  DrawPoint(P1.x,P1.y, "#FF0000")
-    //  DrawPoint(P2.x,P2.y, "#FF0000")
-    //  DrawPoint(P3.x,P3.y, "#FF0000")
-    //   console.log('cccc ' + IsOnTheRight(P2,P1,P3))
-    // InsertSort(chosen)
-  //    DrawLines(chosen);
 }
+
+function FillRandom(x){
+    Points = []
+    var min = -range, max = range
+    for (var i = 0; i < x; i++) {
+        Points.push({x: GetRandom(min, max),y: GetRandom(min,max)})
+    }
+    size = Points.length
+    return Points;
+}
+
+function GetRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
+
+function RemoveDuplicates(arr) {
+    return arr.reduce(function (p, c) {
+      var key = [c.x, c.y].join('|');
+      if (p.temp.indexOf(key) === -1) {
+        p.out.push(c);
+        p.temp.push(key);
+      }
+      return p;
+    }, { temp: [], out: [] }).out;
+  }
 
 function QuickHull(points){
     var a = points[0]
@@ -46,10 +76,8 @@ function QuickHull(points){
         else{
             down.push(points[i])
         }
-        // console.log(ccw(a,b,points[i]))
     }
-    // chosen = up;
-    // return;
+
     FindHull(up,b,a)
     FindHull(down,a,b)
 
@@ -78,16 +106,8 @@ function FindHull(points, pA, pB, dir = true){
             newList.push(points[i]);
         }
     }
-
-    console.log('possible points '+ newList.length)
-    //chosen = newList;
-   // return;
-
-    //if(newList.length == 0 ){
-    //chosen.push(pC);
-    chosen.splice(1, 0, pC);
-      //  return;
-    //}
+   chosen.splice(1, 0, pC);
+ 
 
     var up = [], down = []
     for (var i = 0; i < newList.length; i++) {
@@ -98,9 +118,9 @@ function FindHull(points, pA, pB, dir = true){
         }
     }
 
-    console.log('la resolucion')
-    console.log(up)
-    console.log(down)
+    // console.log('la resolucion')
+    // console.log(up)
+    // console.log(down)
 
     FindHull(up,pA,pC)
     FindHull(down,pC,pB)
@@ -121,50 +141,6 @@ function FillPoints(){
     // points = [{x: 0, y:  0}, {x: 0, y:  4}, {x: -4, y:  0}, {x: 5, y:  0}, {x: 0, y:  -6}, {x: 1, y:  0}]
 }
 
-// function DrawLines(){
-//     for (var i = 0; i < L.length; i++) {
-//         Draw(L[i].p0,L[i].p1)
-//     }
-// }
-
-// function DrawPoints(pointsToDraw){
-    
-//     for (var i = 0; i < pointsToDraw.length; i++) {
-//         DrawPoint(pointsToDraw[i].x,pointsToDraw[i].y,"#000000")
-//     }
- 
-// }
-
-// function DrawLines(linePoints){
-//     for (var i = 0; i < linePoints.length-1; i++) {
-//         console.log('ddddd')
-//         Draw(linePoints[i],linePoints[i+1])
-//     }
-//     // Draw(linePoints[linePoints.length-1],linePoints[0])
-// }
-
-// var mH = height/2, mW = width/2, multiplier = 10, pointSize = 5
-
-// function DrawPoint(x,y, color){
-//     ctx.fillStyle = color;
-//     ctx.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
-// }
-
-// function TriangleArea(p1,p2,p3){
-//     return Math.abs(0.5 * ((p1.x*p2.y)+(p2.x*p3.y)+(p3.x*p1.y)-(p1.x*p3.y)-(p2.x*p1.y)-(p3.x*p2.y)))
-// }
-
-// function Draw(p1,p2){
-//     ctx.beginPath();
-//     x1 = mW+(p1.x*multiplier)-(pointSize/2)
-//     x2 = mW+(p2.x*multiplier)-(pointSize/2)
-//     y1 = mH-(p1.y*multiplier)-(pointSize/2)
-//     y2 = mH-(p2.y*multiplier)-(pointSize/2)
-    
-//     ctx.moveTo(x1,y1);
-//     ctx.lineTo(x2,y2);
-//     ctx.stroke();
-// }
 
 function IsOnTheRight(p1,p2,p3){
     return (ccw(p1, p2, p3) < 0)
@@ -193,32 +169,49 @@ function computeAngle(v1, v2) {
     return Math.acos(ac / (norm(v1) * norm(v2))) * ONE_RADIAN;
 }
 
-function InsertSort(array, compareX = true){
-    var i, key, j;
-    for (var i = 0; i < array.length; i++) {
-	{
-		key = array[i];
-		j = i - 1;
+function Partition (array, low, high, type)
+{
+    var pivot = array[high];    // pivot
+    var i = (low - 1);  // Index of smaller element
+    var swapValues
+    for (var j = low; j <= high- 1; j++)
+    {
+        // If current element is smaller than or
+        // equal to pivot
+        if (type=='x'){
+            swapValues = array[j].x <= pivot.x;
+        }
+        else if(type=='y'){
+            swapValues = array[j].y <= pivot.y;
+        }
+        else if(type=='angle'){
+            swapValues = array[j].angle <= pivot.angle;
+        }
 
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-        of their current position */
-        if(compareX){
-            while (j >= 0 && array[j].x > key.x)
-            {
-                array[j + 1] = array[j];
-                j = j - 1;
-            }
+        if(swapValues)
+        {
+            i++;    
+            array.swap(i,j)
         }
-        else{
-            while (j >= 0 && array[j].y > key.y)
-            {
-                array[j + 1] = array[j];
-                j = j - 1;
-            }
-        }
-		array[j + 1] = key;
-	}
+    }
+    array.swap(i+1,high)
+    return (i + 1);
+}
+
+Array.prototype.swap = function (x,y) {
+    var b = this[x];
+    this[x] = this[y];
+    this[y] = b;
+}
+
+function QuickSort(array, low, high, type = 'x')
+{
+    if (low < high)
+    {
+        var pi = Partition(array, low, high, type);
+ 
+        QuickSort(array, low, pi - 1, type);
+        QuickSort(array, pi + 1, high, type);
     }
 }
 
@@ -232,3 +225,4 @@ function IsInsideTriangle(A,B,C,P){
         var w2 = (s4- w1 * s3) / s1;
         return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
 }
+

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+        <title>TO - Quick Hull and Graham Scan - Gabriel Fazenda</title>
+   <head>
+           <link rel="stylesheet" href="style.css">
+   </head>     
+<body>
+
+<div class="row">
+        <div class="column">
+                <h1>QuickHull</h1>
+                <canvas id="QuickHull" width="500" height="500"  style="border:1px solid #000000;"></canvas>
+                <div> 
+                        <button type="button" onclick="DoNormal()">Predefined</button>
+                        <button type="button" onclick="DoRandom()">Scan</button>
+                </div>
+        </div> 
+
+        <div class="column">
+                <h1>Graham Scan</h1>
+                <canvas id="GrahamScan" width="500" height="500" style="border:1px solid #000000;"></canvas>
+                <div> 
+                        <button type="button" onclick="DoGrahamNormal()">Predefined</button>
+                        <button type="button" onclick="DoGrahamRandom()">Scan</button>
+                </div>
+        </div> 
+   
+       
+</div>
+<script src="QuickHull.js"></script>
+<script src="GrahamScan.js"></script>
+<script src="Draw.js"></script>
+</body>
+</html>

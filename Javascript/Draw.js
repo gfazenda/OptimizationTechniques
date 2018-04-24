@@ -1,4 +1,4 @@
-var height = 300, width = 300
+var height = 500, width = 500
 var mH = height/2, mW = width/2, multiplier = 8, pointSize = 5
 var ctx;
 
@@ -61,9 +61,9 @@ function Draw(p1,p2){
 }
 
 
-function clearCanvas() {
+function clearCanvas(canvas) {
     ctx.clearRect(0, 0, width,height);
-    // var w = canvas.width;
-    // canvas.width = 1;
-    // canvas.width = w;
+    var w = canvas.width;
+    canvas.width = 1;
+    canvas.width = w;
 }

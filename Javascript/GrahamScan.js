@@ -1,6 +1,6 @@
 
-var canvas = document.getElementById("GrahamScan"),
-contextGraham = canvas.getContext("2d");
+var canvasG = document.getElementById("GrahamScan"),
+contextGraham = canvasG.getContext("2d");
 
 var points = [];
 var height = 300, width = 300
@@ -8,11 +8,27 @@ var mH = height/2, mW = width/2, multiplier = 8, pointSize = 5
 var hullPoints = []
 var PI = 3.14
 var ONE_RADIAN = (2*PI)
+var initial;
+
+function DoGrahamNormal(){
+    SetCTX(contextGraham)
+    clearCanvas(canvasG);
+    FillPoints();
+    DoGrahamScan();
+}
+
+function DoGrahamRandom(){
+    SetCTX(contextGraham)
+    clearCanvas(canvasG);
+    points = FillRandom(50);
+    DoGrahamScan();
+}
 
 function DoGrahamScan(){
-    SetCTX(contextGraham)
-    FillPoints();   
 
+    SetCTX(contextGraham)
+
+    hullPoints = []
     QuickSort(points, 0, points.length-1,'y')
 
     DrawPoints(points)
@@ -31,26 +47,30 @@ function GrahamScan(array){
     initial = array[0]
    
     array.splice(0,1);
-    //console.log('2222222')
-   // console.log(initial)
    
    for (var i = 0; i < array.length; i++) {
         var angle = polarAngle(array[i],initial)
         array[i].angle = angle;
-        // console.log(array[i].angle);
-       
+     
     }
-   // console.log('dklsfdkl')
-   // console.log(array)
     
     QuickSort(array,0,array.length-1,'angle');
-    //InsertSortByAngle(array)
 
-    
-    // hullPoints.push(array[0])
-    // hullPoints.push(array[1])
-    // //hullPoints.push(array[2])
-    // return;
+    for (var i = 0; i < array.length - 1; i++)
+        {
+            while (i < array.length - 1 && ccw(initial, array[i], array[i + 1]) == 0)
+            {
+                points.splice(i+1,1);
+                i++;
+            }
+
+        }
+
+    if(array.length < 3){
+        console.log("not valid hull");
+        return null;
+    }
+
 
     hullPoints.push(initial)
     hullPoints.push(array[0])
@@ -61,11 +81,21 @@ function GrahamScan(array){
             hullPoints.pop();
         }
         hullPoints.push(array[i])
-        console.log(hullPoints.length);
     }
-    //  console.log(array)
+}
 
+function FillRandom(x){
+    Points = []
+    var min = -15, max = 15
+    for (var i = 0; i < x; i++) {
+        Points.push({x: GetRandom(min, max),y: GetRandom(min,max)})
+    }
+    size = Points.length
+    return Points;
+}
 
+function GetRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
 if(!Array.prototype.last) {
@@ -107,17 +137,17 @@ function FillPoints(){
 
     //  points = [{x: 0, y:  0}, {x: 0, y:  4}, {x: -4, y:  0}, {x: 5, y:  0}, {x: 0, y:  -6}, {x: 1, y:  0}]
 
-     points = [{x:1, y:2.5},
-        {x:3.5, y:2},
-        {x:7, y:4.4},
-        {x:8, y:5.5},
-        {x:1.2, y:2.7},
-        {x:9, y:4.5},
-        {x:6.4, y:3},
-        {x:2.3, y:8.3},
-        {x:5.6, y:6.7},
-        {x:1, y:4},
-        {x:5, y:-3}]
+    //  points = [{x:1, y:2.5},
+    //     {x:3.5, y:2},
+    //     {x:7, y:4.4},
+    //     {x:8, y:5.5},
+    //     {x:1.2, y:2.7},
+    //     {x:9, y:4.5},
+    //     {x:6.4, y:3},
+    //     {x:2.3, y:8.3},
+    //     {x:5.6, y:6.7},
+    //     {x:1, y:4},
+    //     {x:5, y:-3}]
 }
 
 
@@ -157,57 +187,6 @@ function computeAngle(v1, v2) {
     return Math.acos(ac / (norm(v1) * norm(v2))) * ONE_RADIAN;
 }
 
-function InsertSort(array, compareX = true){
-    var i, key, j;
-    for (var i = 0; i < array.length; i++) {
-	
-		key = array[i];
-		j = i - 1;
-
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-        of their current position */
-        if(compareX){
-            while (j >= 0 && array[j].x > key.x)
-            {
-                array[j + 1] = array[j];
-                j = j - 1;
-            }
-        }
-        else{
-            while (j >= 0 && array[j].y > key.y)
-            {
-                array[j + 1] = array[j];
-                j = j - 1;
-            }
-        }
-		array[j + 1] = key;
-	}
-
-
-}
-
-function InsertSortByAngle(array){
-    var i, key, j;
-    for (var i = 0; i < array.length; i++) {
-	
-		key = array[i];
-		j = i - 1;
-
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-        of their current position */
-        while (j >= 0 && array[j].angle > key.angle)
-        {
-            array[j + 1] = array[j];
-            j = j - 1;
-        }
-
-        array[j + 1] = key;
-    }
-}
-
-
 function Partition (array, low, high, type)
 {
     var pivot = array[high];    // pivot
@@ -224,7 +203,7 @@ function Partition (array, low, high, type)
             swapValues = array[j].y <= pivot.y;
         }
         else if(type=='angle'){
-            swapValues = array[j].angle <= pivot.angle;
+            swapValues = CompareAngles(array[j],pivot);
         }
 
         if(swapValues)
@@ -237,28 +216,28 @@ function Partition (array, low, high, type)
     return (i + 1);
 }
 
+function CompareAngles(a,b){
+    if(a.angle===b.angle){
+        return dist(initial,a) > dist(initial,b) ? true : false;
+    }else{
+        return a.angle <= b.angle;
+    }
+
+}
+
+
 Array.prototype.swap = function (x,y) {
-    console.log('ot')
     var b = this[x];
     this[x] = this[y];
     this[y] = b;
-    //return this;
 }
 
-/* The main function that implements QuickSort
- arr[] --> Array to be sorted,
-  low  --> Starting index,
-  high  --> Ending index */
 function QuickSort(array, low, high, type = 'x')
 {
     if (low < high)
     {
-        /* pi is partitioning index, arr[p] is now
-           at right place */
         var pi = Partition(array, low, high, type);
  
-        // Separately sort elements before
-        // partition and after partition
         QuickSort(array, low, pi - 1, type);
         QuickSort(array, pi + 1, high, type);
     }
@@ -274,4 +253,9 @@ function IsInsideTriangle(A,B,C,P){
         var w1 = (A.x * s1 + s4 * s2 - P.x * s1) / (s3 * s2 - (B.x-A.x) * s1);
         var w2 = (s4- w1 * s3) / s1;
         return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
+}
+
+function dist(p1,p2){
+    return Math.sqrt((p1.x - p2.x)*(p1.x - p2.x) +
+                    (p1.y - p2.y)*(p1.y - p2.y));
 }

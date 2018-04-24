@@ -16,16 +16,35 @@ function Predefined(){
 }
 
 function Random(){
-    FillRandom(20);
+    FillRandom(50);
+
+    Px = Points;
+    Py = Points;
+    QuickSort(Px,0,Px.length-1,'x')
+    QuickSort(Py,0,Py.length-1,'y')
+    console.log(Px)
+    console.log(Py)
+   
+    Points = RemoveDuplicates(Points)
+   
+   // console.log(Points)
+   
     CalculateClosestPoint()
 }
 
 function CalculateClosestPoint(){
     //ordena por x
-    QuickSort(points,0,points.length-1,'x')
+    pointsToCheck = []
+    QuickSort(Points,0,Points.length-1,'x')
     console.log(Points)
-
-    var resultDivide = closestDivideAndConquer(Points)
+    Px = Points.clone();
+    Py = Points.clone();
+    QuickSort(Px,0,Px.length-1,'x')
+    QuickSort(Py,0,Py.length-1,'y')
+    // console.log(Px)
+    // console.log(Py)
+    // return;
+    var resultDivide = closestDivideAndConquer(Px,Py,Points.length)
 
     var resultBrute = BruteForce(Points);
 
@@ -33,8 +52,9 @@ function CalculateClosestPoint(){
 
     console.log('resultBrute: ' + dist(resultBrute[0],resultBrute[1]))
     console.log('resultDivide: ' + resultDivide)
-    console.log('to see ' + pointsToCheck.length)
+    console.log('size possible ' + pointsToCheck.length)
     var closestPoints = GetPoints(resultDivide)
+   
     console.log(closestPoints)
     DrawPoint(closestPoints[0].x,closestPoints[0].y, "#FF0000")
     DrawPoint(closestPoints[1].x,closestPoints[1].y, "#FF0000")
@@ -51,6 +71,10 @@ function GetPoints(result){
         }
     }
 }
+
+Array.prototype.clone = function() {
+	return this.slice();
+};
 
 function DrawOnCanvas(){
     clearCanvas(ctx,canvas)
@@ -90,6 +114,17 @@ function FillRandom(x){
     }
     size = Points.length
 }
+
+function RemoveDuplicates(arr) {
+    return arr.reduce(function (p, c) {
+      var key = [c.x, c.y].join('|');
+      if (p.temp.indexOf(key) === -1) {
+        p.out.push(c);
+        p.temp.push(key);
+      }
+      return p;
+    }, { temp: [], out: [] }).out;
+  }
 
 function GetRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -143,70 +178,63 @@ function DrawPoint2(x,y, color){
     ctx2.fillStyle = color;
     ctx2.fillRect(mW+(x*multiplier)-(pointSize/2),mH-(y*multiplier)-(pointSize/2),pointSize,pointSize);
 }
+
 pointsToCheck = []
-function closestDivideAndConquer(P, msg = 'blank'){ 
-        
-        if(P.length==1){
+
+function closestDivideAndConquer(Px,Py,n){ 
+        if(n==1){
             return 200
         }
-        if(P.length==2){
-            pointsToCheck.push(P[0])
-            pointsToCheck.push(P[1])
-            return dist(P[0],P[1]);
-        }
 
-        if(P.length<=3){
-            var result = BruteForce(P);
-
+        if(n<=3){
+            var result = BruteForce(Px);
+            pointsToCheck = []
             pointsToCheck.push(result[0])
             pointsToCheck.push(result[1])
             return dist(result[0],result[1])
         }
         
-        var mid = Math.round((P.length)/2);
-        // console.log(mid)
-        var midPoint = P[mid]
-        //var midPoint = P[mid];
+        var mid = Math.round(n/2);
+        var midPoint = Px[mid]
+  
+
         var P1 = [], P2 = [];
-        for (var i = 0; i < P.length; i++) {
-            if(i<mid){
-                P1.push(P[i]);
+        for (var i = 0; i < Py.length; i++) {
+            if (Py[i].x <= midPoint.x){
+                P1.push(Py[i]);
             }
             else{
-                P2.push(P[i]);
+                P2.push(Py[i]);
             }
         }
-
-        console.log('L1: '+P1.length)
-        console.log('L2: '+P2.length)
-        d1 = closestDivideAndConquer(P1, 'd1');
-        d2 = closestDivideAndConquer(P2, 'd2');
+      
+ 
+        d1 = closestDivideAndConquer(Px,P1,mid);
+        d2 = closestDivideAndConquer(Px,P2,n-mid);
         
-        console.log('d1 ' + d1)
-        console.log('d2 ' + d2)
 
         var d = Math.min(d1,d2)
-        console.log('d ' + d)
+
 
         var borderPoints = []
-        for (var i = 0; i < P.length; i++){
-            if (Math.abs(P[i].x - midPoint.x) < d){
-                borderPoints.push(P[i])
-            }
+
+
+        
+        for (var i = 0; i < Py.length; i++){
+            if (Math.abs(Py[i].x - midPoint.x) < d)
+                borderPoints.push(Py[i]);
         }
 
         var result = Math.min(d,CheckBorderPoints(borderPoints,d))
-        console.log('the result is ' + result)
-        console.log('i am ' + msg)
+
         return result
     }
 
 function CheckBorderPoints(points,minDist){
-    console.log('received '+minDist)
+
     if(points.length <2)
         return minDist;
-    QuickSort(points,0,points.length-1,'y')
-    console.log('the size ' + points.length)
+ 
     var list = []
     var min = minDist
     for (var i = 0; i < points.length-1; i++) {
@@ -216,11 +244,11 @@ function CheckBorderPoints(points,minDist){
                 list.push(points[i])
                 list.push(points[j])
                 min = dist(points[i], points[j]);
-                console.log('min '+ min)
             }
            }
     }
     if(list.length ==2){
+        pointsToCheck = []
         pointsToCheck.push(list[0])
         pointsToCheck.push(list[1])
     }
@@ -234,8 +262,6 @@ function Partition (array, low, high, type)
     var swapValues
     for (var j = low; j <= high- 1; j++)
     {
-        // If current element is smaller than or
-        // equal to pivot
         if (type=='x'){
             swapValues = array[j].x <= pivot.x;
         }
@@ -254,59 +280,19 @@ function Partition (array, low, high, type)
 }
 
 Array.prototype.swap = function (x,y) {
-    console.log('ot')
     var b = this[x];
     this[x] = this[y];
     this[y] = b;
-    //return this;
 }
 
-/* The main function that implements QuickSort
- arr[] --> Array to be sorted,
-  low  --> Starting index,
-  high  --> Ending index */
 function QuickSort(array, low, high, type = 'x')
 {
     if (low < high)
     {
-        /* pi is partitioning index, arr[p] is now
-           at right place */
         var pi = Partition(array, low, high, type);
- 
-        // Separately sort elements before
-        // partition and after partition
+
         QuickSort(array, low, pi - 1, type);
         QuickSort(array, pi + 1, high, type);
-    }
-}
-
-
-function InsertSort(array, compareX = true){
-    var i, key, j;
-    for (var i = 0; i < array.length; i++) {
-	{
-		key = array[i];
-		j = i - 1;
-
-		/* Move elements of arr[0..i-1], that are
-		greater than key, to one position ahead
-        of their current position */
-        if(compareX){
-            while (j >= 0 && array[j].x > key.x)
-            {
-                array[j + 1] = array[j];
-                j = j - 1;
-            }
-        }
-        else{
-            while (j >= 0 && array[j].y > key.y)
-            {
-                array[j + 1] = array[j];
-                j = j - 1;
-            }
-        }
-		array[j + 1] = key;
-	}
     }
 }
 
@@ -315,4 +301,4 @@ function clearCanvas(context, canvas) {
     var w = canvas.width;
     canvas.width = 1;
     canvas.width = w;
-  }
+}
