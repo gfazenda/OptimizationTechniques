@@ -22,7 +22,7 @@ function Random(){
 
 function CalculateClosestPoint(){
     //ordena por x
-    InsertSort(Points);
+    QuickSort(points,0,points.length-1,'x')
     console.log(Points)
 
     var resultDivide = closestDivideAndConquer(Points)
@@ -205,7 +205,7 @@ function CheckBorderPoints(points,minDist){
     console.log('received '+minDist)
     if(points.length <2)
         return minDist;
-    InsertSort(points,false)
+    QuickSort(points,0,points.length-1,'y')
     console.log('the size ' + points.length)
     var list = []
     var min = minDist
@@ -226,6 +226,60 @@ function CheckBorderPoints(points,minDist){
     }
     return min;
 }
+
+function Partition (array, low, high, type)
+{
+    var pivot = array[high];    // pivot
+    var i = (low - 1);  // Index of smaller element
+    var swapValues
+    for (var j = low; j <= high- 1; j++)
+    {
+        // If current element is smaller than or
+        // equal to pivot
+        if (type=='x'){
+            swapValues = array[j].x <= pivot.x;
+        }
+        else if(type=='y'){
+            swapValues = array[j].y <= pivot.y;
+        }
+
+        if(swapValues)
+        {
+            i++;    
+            array.swap(i,j)
+        }
+    }
+    array.swap(i+1,high)
+    return (i + 1);
+}
+
+Array.prototype.swap = function (x,y) {
+    console.log('ot')
+    var b = this[x];
+    this[x] = this[y];
+    this[y] = b;
+    //return this;
+}
+
+/* The main function that implements QuickSort
+ arr[] --> Array to be sorted,
+  low  --> Starting index,
+  high  --> Ending index */
+function QuickSort(array, low, high, type = 'x')
+{
+    if (low < high)
+    {
+        /* pi is partitioning index, arr[p] is now
+           at right place */
+        var pi = Partition(array, low, high, type);
+ 
+        // Separately sort elements before
+        // partition and after partition
+        QuickSort(array, low, pi - 1, type);
+        QuickSort(array, pi + 1, high, type);
+    }
+}
+
 
 function InsertSort(array, compareX = true){
     var i, key, j;
